@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Results;
+use App\Models\Result;
 use App\Models\Files;
 
 class ResultsController extends Controller
@@ -15,7 +15,7 @@ class ResultsController extends Controller
      */
     public function index()
     {
-        $results = new Results;
+        $results = new Result;
         $results = $results->paginate(4);
         return view('school.admin.Result.index', compact('results'));
     }
@@ -38,27 +38,17 @@ class ResultsController extends Controller
      */
     public function store(Request $request)
     {
-        $results = new Results;
-        $validate_data = $request->validate(
-            [
-                'studentID' => 'required',
-                'name' => 'required',
-                'subject' => 'required',
-                'full_marks' => 'required',
-                'pass_marks' => 'required',
-                'acquired_marks' => 'required',
-                'remarks' => 'required',
-            ]
-        );
-        $results->studentID = $request->studentID;
-        $results->name = $request->name;
-        $results->subject = $request->subject;
-        $results->full_marks = $request->full_marks;
-        $results->pass_marks = $request->pass_marks;
-        $results->acquired_marks = $request->acquired_marks;
-        $results->remarks = $request->remarks;
+        $validated = $request->validate([
+            'studentID'        => 'required|exists:students,id',
+            'name'             => 'required|string|max:255',
+            'subject'          => 'required|string|max:255',
+            'full_marks'       => 'required|integer|min:0',
+            'pass_marks'       => 'required|integer|min:0',
+            'acquired_marks'   => 'required|integer|min:0',
+            'remarks'          => 'required|string',
+        ]);
 
-        $results->save();
+        Result::create($validated);
         return redirect('admin/result')->with('message', 'Your data is submitted ');
         //
     }
@@ -72,7 +62,7 @@ class ResultsController extends Controller
     public function show($resultID)
     {
         $files = Files::all();
-        $results = new Results;
+        $results = new Result;
         $results = $results->where('resultID', $resultID)->First();
         return view('school.admin.Result.show', compact('results'));
     }
@@ -86,7 +76,7 @@ class ResultsController extends Controller
     public function edit($resultID)
     {
         $files = Files::all();
-        $results = new Results;
+        $results = new Result;
         $results = $results->where('resultID', $resultID)->First();
         return view('school.admin.Result.edit', compact('results'));
     }
@@ -100,7 +90,7 @@ class ResultsController extends Controller
      */
     public function update(Request $request, $resultID)
     {
-        $results = new Results;
+        $results = new Result;
         $results = $results->where('resultID', $resultID)->First();
         $results->studentID = $request->studentID;
         $results->name = $request->name;
@@ -121,7 +111,7 @@ class ResultsController extends Controller
      */
     public function destroy($resultID)
     {
-        $results = new Results;
+        $results = new Result;
         $results = $results->where('resultID', $resultID)->first();;
         $results->delete();
         return redirect('admin/result')->with('message', 'Your data has been deleted');

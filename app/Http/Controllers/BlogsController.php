@@ -39,33 +39,20 @@ class BlogsController extends Controller
      */
     public function store(Request $request)
     {
-        $blogs = new Blogs;
-        $validate_data = $request->validate(
-            [
-                'img' => 'required',
-                'title' => 'required',
-                'introduction' => 'required',
-                'type' => 'required',
-                'highlight' => 'required',
-                'description' => 'required',
-                'description2' => 'required',
-                'writerName' => 'required',
-                'post' => 'required',
-                'writerView' => 'required',
-            ]
-        );
-        $blogs->img = $request->img;
-        $blogs->introduction = $request->introduction;
-        $blogs->type = $request->type;
-        $blogs->highlight = $request->highlight;
-        $blogs->title = $request->title;
-        $blogs->description = $request->description;
-        $blogs->description2 = $request->description2;
-        $blogs->writerName = $request->writerName;
-        $blogs->post = $request->post;
-        $blogs->writerView = $request->writerView;
+        $validated = $request->validate([
+            'img'            => 'required|string|max:255',
+            'title'          => 'required|string|max:255',
+            'introduction'   => 'required|string',
+            'type'           => 'required|string|max:100',
+            'highlight'      => 'required|string',
+            'description'    => 'required|string',
+            'description2'   => 'required|string',
+            'writerName'     => 'required|string|max:255',
+            'post'           => 'required|string',
+            'writerView'     => 'required|string',
+        ]);
+        -Blogs::create($validated);
 
-        $blogs->save();
         return redirect('admin/blog')->with('message', 'Your data is submitted ');
         //
     }
@@ -107,19 +94,22 @@ class BlogsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $blogs = new Blogs;
-        $blogs = $blogs->where('id', $id)->First();
-        $blogs->img = $request->img;
-        $blogs->introduction = $request->introduction;
-        $blogs->type = $request->type;
-        $blogs->highlight = $request->highlight;
-        $blogs->title = $request->title;
-        $blogs->description = $request->description;
-        $blogs->description2 = $request->description2;
-        $blogs->writerName = $request->writerName;
-        $blogs->post = $request->post;
-        $blogs->writerView = $request->writerView;
-        $blogs->update();
+        $validated = $request->validate([
+            'img'            => 'required|string|max:255',
+            'title'          => 'required|string|max:255',
+            'introduction'   => 'required|string',
+            'type'           => 'required|string|max:100',
+            'highlight'      => 'required|string',
+            'description'    => 'required|string',
+            'description2'   => 'required|string',
+            'writerName'     => 'required|string|max:255',
+            'post'           => 'required|string',
+            'writerView'     => 'required|string',
+        ]);
+
+        $blog = Blogs::findOrFail($id);
+
+        $blog->update($validated);
         return redirect('admin/blog');
     }
 

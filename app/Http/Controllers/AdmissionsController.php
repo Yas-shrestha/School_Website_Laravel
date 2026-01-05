@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\admissions;
+use App\Models\Admission;
 use Illuminate\Support\Facades\File;
 
 class AdmissionsController extends Controller
@@ -15,7 +15,7 @@ class AdmissionsController extends Controller
      */
     public function index()
     {
-        $admissions = new admissions;
+        $admissions = new Admission;
         $admissions = $admissions->paginate(4);
         return view('school.admin.Admission.index', compact('admissions'));
     }
@@ -27,7 +27,7 @@ class AdmissionsController extends Controller
      */
     public function create()
     {
-        // $admissions = new admissions;
+        // $admissions = new Admission;
         // return view('school.admin.Admission.create', compact('admissions'));
     }
 
@@ -39,24 +39,23 @@ class AdmissionsController extends Controller
      */
     public function store(Request $request)
     {
-        $admissions = new admissions;
-        $validate_data = $request->validate(
-            [
-                'studentID' => 'required',
-                'courseID' => 'required',
-                'name' => 'required',
-                'courseName' => 'required',
-                'img' => 'required',
-            ]
-        );
-        $fileName = $request->id . '-' . time() . '.' . $request->img->extension();
-        $request->img->move(public_path('formimg'), $fileName);
-        $admissions->img = $fileName;
-        $admissions->studentID = $request->studentID;
-        $admissions->courseID = $request->courseID;
-        $admissions->name = $request->name;
-        $admissions->courseName = $request->courseName;
-        $admissions->save();
+        $validated = $request->validate([
+            'studentID'   => 'required|exists:students,id',
+            'courseID'    => 'required|exists:courses,id',
+            'name'        => 'required|string|max:255',
+            'courseName'  => 'required|string|max:255',
+            'img'         => 'required|image|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('img')) {
+            $fileName = $validated['studentID'] . '-' . time() . '.' . $request->img->extension();
+            $request->img->move(public_path('formimg'), $fileName);
+            $validated['img'] = $fileName;
+        }
+
+        Admission::create($validated);
+
         return redirect('booked');
     }
 
@@ -68,7 +67,7 @@ class AdmissionsController extends Controller
      */
     public function show($admissionID)
     {
-        $admissions = new admissions;
+        $admissions = new Admission;
         $admissions = $admissions->where('admissionID', $admissionID)->First();
         return view('school.admin.Admission.show', compact('admissions'));
     }
@@ -81,7 +80,7 @@ class AdmissionsController extends Controller
      */
     public function edit($admissionID)
     {
-        $admissions = new admissions;
+        $admissions = new Admission;
         $admissions = $admissions->where('admissionID', $admissionID)->First();
         return view('school.admin.Admission.edit', compact('admissions'));
     }
@@ -95,22 +94,31 @@ class AdmissionsController extends Controller
      */
     public function update(Request $request, $admissionID)
     {
-        $admissions = Admissions::where('admissionID', $admissionID)->first();
-        if ($request->img != NULL) {
-            $fileName = $request->course_code . "-" . time() . '.' . $request->img->extension();
-            File::delete(public_path('uploads/' . $admissions->img));
+        $admission = Admission::where('admissionID', $admissionID)->firstOrFail();
+
+        // Handle image upload
+        if ($request->hasFile('img')) {
+            $fileName = $request->course_code . '-' . time() . '.' . $request->img->extension();
+
+            // Delete old image if exists
+            if ($admission->img && File::exists(public_path('uploads/' . $admission->img))) {
+                File::delete(public_path('uploads/' . $admission->img));
+            }
+
             $request->img->move(public_path('uploads'), $fileName);
-            $admissions::where('admissionID', $admissionID)
-                ->update([
-                    'img' => $fileName,
-                ]);
+            $admission->img = $fileName;
         }
-        $admissions->studentID = $request->studentID;
-        $admissions->courseID = $request->courseID;
-        $admissions->name = $request->name;
-        $admissions->courseName = $request->courseName;
-        $admissions->updated_at = now();
-        $admissions->save();
+
+        // Mass assign safe fields
+        $admission->fill([
+            'studentID'   => $request->studentID,
+            'courseID'    => $request->courseID,
+            'name'        => $request->name,
+            'courseName'  => $request->courseName,
+        ]);
+
+        $admission->save();
+
         return redirect('admin/admission');
     }
     /**
@@ -121,7 +129,7 @@ class AdmissionsController extends Controller
      */
     public function destroy($admissionID)
     {
-        $admissions = new admissions;
+        $admissions = new Admission;
         $admissions = $admissions->where('admissionID', $admissionID);
         File::delete(public_path('uploads/' . $admissions->img));
         $admissions->delete();
