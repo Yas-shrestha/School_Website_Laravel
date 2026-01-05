@@ -14,9 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('results', function (Blueprint $table) {
-            $table->id('resultID');
-            $table->bigInteger('studentID')->unsigned()->index()->nullable();
-            $table->foreign('studentID')->references('id')->on('student')->onDelete('cascade');
+            $table->id();
+            $table->foreignId('student_id')
+                ->nullable()
+                ->constrained('students')
+                ->cascadeOnDelete();
             $table->string('name');
             $table->string('subject');
             $table->string('full_marks');

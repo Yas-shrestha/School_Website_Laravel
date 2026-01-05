@@ -15,8 +15,10 @@ return new class extends Migration
     {
         Schema::create('notices', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('teacherID')->unsigned()->index()->nullable();
-            $table->foreign('teacherID')->references('id')->on('teacher')->onDelete('cascade');
+            $table->foreignId('teacher_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
             $table->string('title');
             $table->longText('description');
             $table->timestamps();

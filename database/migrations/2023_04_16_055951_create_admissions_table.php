@@ -14,11 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('admissions', function (Blueprint $table) {
-            $table->id('admissionID');
-            $table->bigInteger('studentID')->unsigned()->index()->nullable();
-            $table->foreign('studentID')->references('id')->on('student')->onDelete('cascade');
-            $table->bigInteger('courseID')->unsigned()->index()->nullable();
-            $table->foreign('courseID')->references('id')->on('course')->onDelete('cascade');
+            $table->id();
+            $table->foreignId('student_id')
+                ->nullable()
+                ->constrained('students')
+                ->cascadeOnDelete();
+
+            $table->foreignId('course_id')
+                ->nullable()
+                ->constrained('courses')
+                ->cascadeOnDelete();
             $table->string('img');
             $table->string('name');
             $table->string('courseName');
