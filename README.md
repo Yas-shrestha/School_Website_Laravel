@@ -77,15 +77,15 @@ This ensures the website is **fully dynamic** and can be updated without modifyi
 
 ---
 
-# Folder Structure (Example)
-project-root/
-├─ app/ # Backend logic
-├─ routes/ # Web routes
-├─ resources/
-│ ├─ views/ # Frontend templates
-│ └─ assets/ # CSS, JS, images
-├─ public/ # Public assets
-├─ database/ # Migrations, seeds
+> # Folder Structure (Example)
+> project-root/
+> ├─ app/ # Backend logic
+> ├─ routes/ # Web routes
+> ├─ resources/
+>> │ ├─ views/ # Frontend templates
+>> │ └─ assets/ # CSS, JS, images
+> ├─ public/ # Public assets
+> ├─ database/ # Migrations, seeds
 
 
 ---
