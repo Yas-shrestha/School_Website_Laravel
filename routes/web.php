@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\support\Facades\Auth;
 use Illuminate\support\Facades\View;
@@ -13,6 +14,10 @@ use Illuminate\support\Facades\View;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+
 
 // Authentication Routes...
 Route::get('login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
