@@ -82,8 +82,10 @@ This ensures the website is **fully dynamic** and can be updated without modifyi
 > ├─ app/ # Backend logic \
 > ├─ routes/ # Web routes \
 > ├─ resources/  \
+> 
 >> │ ├─ views/ # Frontend templates \
 >> │ └─ assets/ # CSS, JS, images  \
+>
 > ├─ public/ # Public assets   \
 > ├─ database/ # Migrations, seeds   \
 
